@@ -119,6 +119,9 @@ public class QRCodeScannerController: UIViewController,
     }
     
     deinit {
+        if (captureSession.isRunning) {
+            captureSession.stopRunning()
+        }
         printLog("SwiftQRScanner deallocated")
     }
     
@@ -436,8 +439,11 @@ extension QRCodeScannerController: AVCaptureMetadataOutputObjectsDelegate {
                     } else {
                         delegate?.qrScanner(self, didFailWithError: .emptyResult)
                     }
-                    captureSession.stopRunning()
-                    self.dismiss(animated: true, completion: nil)
+
+                    if (!qrScannerConfiguration.continuousScan) {
+                        captureSession.stopRunning()
+                        self.dismiss(animated: true, completion: nil)
+                    }
                 }
             }
         }
